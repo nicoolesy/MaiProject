@@ -2,6 +2,7 @@ import os
 import json
 import numpy as np
 import pandas as pd
+import time
 from langchain_google_genai import ChatGoogleGenerativeAI
 # from langchain_core.prompts import PromptTemplate
 from sklearn.metrics.pairwise import cosine_similarity
@@ -137,6 +138,17 @@ def format_results(results):
         )
     return "\n\n---\n\n".join(formatted)
 
+def safe_generate_content(prompt, retries=2):
+    for attempt in range(retries):
+        try:
+            return model.generate_content(prompt, timeout=300)
+        except Exception as e:
+            if "DeadlineExceeded" in str(e) and attempt < retries - 1:
+                time.sleep(2)
+                continue
+            else:
+                raise e
+
 chat_history = []
 def ask_parenting_assistant(user_question: str, age_group: str = None, category: str = None):
     global chat_history
@@ -215,7 +227,7 @@ This question is at the '{bloom_level}' level of Bloom's Taxonomy. Adjust your r
 
 Now answer this: {user_question}
 """
-    response = model.generate_content(prompt)
+    response = model.safe_generate_content(prompt)
     answer = response.text
     print(response.text)
 
