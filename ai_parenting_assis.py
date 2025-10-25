@@ -16,7 +16,7 @@ import chromadb
 from chromadb.config import Settings
 from chromadb import PersistentClient
 import google.generativeai as genai
-from IPython.display import HTML, Markdown, display
+# from IPython.display import HTML, Markdown, display
 from dotenv import load_dotenv
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
