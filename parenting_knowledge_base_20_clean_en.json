@@ -1,0 +1,202 @@
+[
+  {
+    "title": "Helping Teens Build Identity",
+    "content": "Teenagers form identity through peer interaction, role exploration, and self-reflection. Parents can support by listening actively and validating their child's feelings.",
+    "tags": [
+      "identity",
+      "adolescence"
+    ],
+    "age_group": "13-18",
+    "category": "identity"
+  },
+  {
+    "title": "Positive Discipline Strategies for Toddlers",
+    "content": "Use redirection, consistent boundaries, and positive reinforcement when guiding toddlers. Avoid punitive measures and focus on teaching through routines.",
+    "tags": [
+      "discipline",
+      "toddlers"
+    ],
+    "age_group": "1-3",
+    "category": "discipline"
+  },
+  {
+    "title": "Supporting Emotional Regulation in Preschoolers",
+    "content": "Preschoolers need help identifying and labeling emotions. Use storybooks, feelings charts, and modeling to build emotional literacy.",
+    "tags": [
+      "emotions",
+      "preschool"
+    ],
+    "age_group": "3-5",
+    "category": "emotions"
+  },
+  {
+    "title": "Building Communication Skills in Early Childhood",
+    "content": "Encourage turn-taking, active listening, and naming feelings to help children express themselves clearly and respectfully.",
+    "tags": [
+      "communication",
+      "early childhood"
+    ],
+    "age_group": "3-6",
+    "category": "communication"
+  },
+  {
+    "title": "Understanding Milestones in Infant Development",
+    "content": "Infants develop rapidly in their first year. Key milestones include smiling, rolling over, sitting, crawling, and early babbling.",
+    "tags": [
+      "development",
+      "infants"
+    ],
+    "age_group": "0-1",
+    "category": "development"
+  },
+  {
+    "title": "Fostering Literacy at Home",
+    "content": "Reading aloud daily, asking open-ended questions, and connecting stories to real life promotes early literacy development.",
+    "tags": [
+      "literacy",
+      "reading"
+    ],
+    "age_group": "3-7",
+    "category": "learning"
+  },
+  {
+    "title": "Setting Boundaries with Elementary-Aged Kids",
+    "content": "Clear expectations and natural consequences help school-age children feel secure and responsible.",
+    "tags": [
+      "discipline",
+      "boundaries"
+    ],
+    "age_group": "6-12",
+    "category": "discipline"
+  },
+  {
+    "title": "Teaching Empathy to Young Children",
+    "content": "Use everyday situations to talk about others' feelings. Ask, 'How would you feel if...?' to develop perspective-taking.",
+    "tags": [
+      "empathy",
+      "social skills"
+    ],
+    "age_group": "4-10",
+    "category": "emotions"
+  },
+  {
+    "title": "Talking to Kids About Difficult Emotions",
+    "content": "Be honest and age-appropriate. Name emotions like anger, sadness, or fear and reassure children they're normal.",
+    "tags": [
+      "emotions",
+      "communication"
+    ],
+    "age_group": "6-12",
+    "category": "emotions"
+  },
+  {
+    "title": "Managing Screen Time with Teens",
+    "content": "Involve teens in setting screen limits. Focus on balance, trust, and discussing the impact of media on mental health.",
+    "tags": [
+      "technology",
+      "boundaries"
+    ],
+    "age_group": "13-18",
+    "category": "discipline"
+  },
+  {
+    "title": "Routines that Support Young Children",
+    "content": "Consistent morning, meal, and bedtime routines create a sense of safety and help regulate behavior in young children.",
+    "tags": [
+      "structure",
+      "routines"
+    ],
+    "age_group": "2-6",
+    "category": "development"
+  },
+  {
+    "title": "Helping Children Cope with Transitions",
+    "content": "Prepare children in advance for changes, validate their feelings, and offer choices when possible to maintain a sense of control.",
+    "tags": [
+      "transitions",
+      "change"
+    ],
+    "age_group": "4-10",
+    "category": "emotions"
+  },
+  {
+    "title": "Parenting Through Puberty",
+    "content": "Be open and nonjudgmental. Use everyday moments to discuss body changes, emotions, and boundaries.",
+    "tags": [
+      "puberty",
+      "teens"
+    ],
+    "age_group": "10-14",
+    "category": "identity"
+  },
+  {
+    "title": "Fostering Independence in School-Age Kids",
+    "content": "Let children make age-appropriate choices, learn from mistakes, and take responsibility for routines and homework.",
+    "tags": [
+      "independence",
+      "responsibility"
+    ],
+    "age_group": "6-12",
+    "category": "development"
+  },
+  {
+    "title": "Teaching Conflict Resolution",
+    "content": "Model healthy communication. Teach children to name problems, express feelings, and seek win-win solutions.",
+    "tags": [
+      "conflict",
+      "communication"
+    ],
+    "age_group": "6-12",
+    "category": "communication"
+  },
+  {
+    "title": "Supporting Learning Styles at Home",
+    "content": "Observe your child\u2019s preferences. Some learn best visually, others through movement or repetition.",
+    "tags": [
+      "learning",
+      "styles"
+    ],
+    "age_group": "5-10",
+    "category": "learning"
+  },
+  {
+    "title": "Raising a Resilient Child",
+    "content": "Allow children to face manageable challenges. Support them emotionally and reflect on what they learned.",
+    "tags": [
+      "resilience",
+      "growth mindset"
+    ],
+    "age_group": "6-12",
+    "category": "development"
+  },
+  {
+    "title": "Navigating Social Media with Your Teen",
+    "content": "Teach critical thinking. Ask about their online experiences and model respectful digital behavior.",
+    "tags": [
+      "social media",
+      "teens"
+    ],
+    "age_group": "13-18",
+    "category": "communication"
+  },
+  {
+    "title": "Encouraging Curiosity in Preschoolers",
+    "content": "Follow their interests, ask open-ended questions, and praise exploration over perfection.",
+    "tags": [
+      "curiosity",
+      "preschool"
+    ],
+    "age_group": "3-5",
+    "category": "learning"
+  },
+  {
+    "title": "Understanding Separation Anxiety",
+    "content": "Offer reassurance, keep goodbyes short, and establish consistent routines. Avoid sneaking away.",
+    "tags": [
+      "anxiety",
+      "separation"
+    ],
+    "age_group": "1-4",
+    "category": "emotions"
+  }
+]
