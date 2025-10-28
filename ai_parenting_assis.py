@@ -19,6 +19,8 @@ import google.generativeai as genai
 # from IPython.display import HTML, Markdown, display
 from dotenv import load_dotenv
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+import time
+import google.api_core.exceptions as google_exceptions
 
 with open("kaggle.json") as f:
     kaggle_credentials = json.load(f)
@@ -137,6 +139,21 @@ def format_results(results):
         )
     return "\n\n---\n\n".join(formatted)
 
+def safe_generate(model, prompt, max_attempts=3):
+    """Retries Gemini API call with shorter prompt and timeout protection."""
+    prompt = prompt[:4000]  # limit length for safety
+    for attempt in range(max_attempts):
+        try:
+            response = model.generate_content(prompt)
+            return response
+        except google_exceptions.DeadlineExceeded:
+            print(f"⚠️ Timeout — retrying ({attempt+1}/{max_attempts})...")
+            time.sleep(2)
+        except Exception as e:
+            print(f"💥 Unexpected error: {e}")
+            break
+    return None
+
 chat_history = []
 def ask_parenting_assistant(user_question: str, age_group: str = None, category: str = None):
     global chat_history
@@ -215,9 +232,13 @@ This question is at the '{bloom_level}' level of Bloom's Taxonomy. Adjust your r
 
 Now answer this: {user_question}
 """
-    response = model.generate_content(prompt)
-    answer = response.text
-    print(response.text)
+    response = safe_generate(model, prompt)
+
+    if response is None:
+        answer = "⚠️ Sorry, Gemini took too long to respond. Please try again in a moment."
+    else:
+        answer = response.text or "⚠️ I didn’t get a response this time, please try again."
+    print(answer)
 
     chat_history.append({
         "question": user_question,
