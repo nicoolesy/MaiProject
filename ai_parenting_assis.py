@@ -27,7 +27,7 @@ load_dotenv()
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 genai.configure(api_key=GOOGLE_API_KEY)
-model = genai.GenerativeModel("gemini-1.5-flash")
+model = genai.GenerativeModel("gemini-1.5-flash-8b")
 
 with open(f"parenting_knowledge_base_20_clean_en.json", "r") as f:
     data = json.load(f)
@@ -72,18 +72,6 @@ def get_sentiment(text):
         return "neutral"
     
 def search_parenting_knowledge(query: str, top_k: int = 3, age_group: str = None, category: str = None):
-    # filters = {}
-    # if age_group:
-    #     filters["age_group"] = age_group
-    # if category:
-    #     filters["category"] = category
-
-    # results = collection.query(
-    #     query_texts=[query],
-    #     n_results=top_k,
-    #     where=filters if filters else None
-    # )
-    
     conditions = []
     if age_group:
         conditions.append({"age_group": age_group})
@@ -242,6 +230,7 @@ This question is at the '{bloom_level}' level of Bloom's Taxonomy. Adjust your r
 
 Now answer this: {user_question}
 """
+    response = None
     try:
         response = model.generate_content(
         prompt,
