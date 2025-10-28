@@ -19,13 +19,7 @@ import time
 import google.api_core.exceptions as google_exceptions
 from dotenv import load_dotenv
 
-
 load_dotenv()
-# Access the API key
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-
-genai.configure(api_key=GOOGLE_API_KEY)
-model = genai.GenerativeModel("gemini-1.5-flash")
 
 with open(f"parenting_knowledge_base_20_clean_en.json", "r") as f:
     data = json.load(f)
