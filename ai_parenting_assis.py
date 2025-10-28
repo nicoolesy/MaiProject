@@ -236,7 +236,7 @@ Question: {user_question}
     try:
         response = model.generate_content(
         prompt,
-        request_options={"timeout": 30}
+        request_options={"timeout": 45}
     )
         answer = response.text
     except Exception as e:
