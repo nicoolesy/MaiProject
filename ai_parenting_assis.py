@@ -3,6 +3,7 @@ import json
 import numpy as np
 import pandas as pd
 import streamlit as st
+import requests
 from langchain_google_genai import ChatGoogleGenerativeAI
 # from langchain_core.prompts import PromptTemplate
 from sklearn.metrics.pairwise import cosine_similarity
@@ -158,6 +159,7 @@ def safe_generate(model, prompt, max_attempts=3):
     return None
 
 chat_history = []
+BACKEND_URL = "https://mai-backend.onrender.com/ask"
 def ask_parenting_assistant(user_question: str, age_group: str = None, category: str = None):
     global chat_history
 
@@ -218,17 +220,11 @@ Instruction: {instructions}
 Question: {user_question}
 """.strip()
 
-    response = None
     try:
-        with model.generate_content(prompt, stream=True) as stream:
-            partial_text = ""
-            for chunk in stream:
-                if chunk.text:
-                    partial_text += chunk.text
-                    st.write(partial_text)  # shows incremental output in Streamlit
-        answer = partial_text.strip()
+        res = requests.post(BACKEND_URL, json={"prompt": prompt})
+        answer = res.json().get("answer", "⚠️ No response from backend.")
     except Exception as e:
-        answer = "⚠️ Gemini took too long. Please try again shortly."
+        answer = f"⚠️ Error contacting backend: {e}"
 
     chat_history.append({"question": user_question, "answer": answer, "context": context})
     return answer
