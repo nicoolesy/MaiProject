@@ -27,7 +27,7 @@ load_dotenv()
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 genai.configure(api_key=GOOGLE_API_KEY)
-model = genai.GenerativeModel("gemini-1.5-flash-8b")
+model = genai.GenerativeModel("gemini-1.5-flash")
 
 with open(f"parenting_knowledge_base_20_clean_en.json", "r") as f:
     data = json.load(f)
@@ -226,7 +226,7 @@ Question: {user_question}
     try:
         response = model.generate_content(
         prompt,
-        request_options={"timeout": 45}
+        request_options={"timeout": 120}
     )
         answer = response.text
     except Exception as e:
