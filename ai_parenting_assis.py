@@ -2,14 +2,10 @@ import os
 import json
 import numpy as np
 import pandas as pd
-import streamlit as st
 import requests
 from langchain_google_genai import ChatGoogleGenerativeAI
-# from langchain_core.prompts import PromptTemplate
 from sklearn.metrics.pairwise import cosine_similarity
 from langchain_community.vectorstores import Chroma
-# from langchain_text_splitters import CharacterTextSplitter
-# from langchain.document_loaders import TextLoader
 from langchain.document_loaders import TextLoader
 from langchain_text_splitters import CharacterTextSplitter
 from langchain.vectorstores import Chroma
@@ -18,14 +14,10 @@ import chromadb
 from chromadb.config import Settings
 from chromadb import PersistentClient
 import google.generativeai as genai
-# from IPython.display import HTML, Markdown, display
-from dotenv import load_dotenv
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import time
 import google.api_core.exceptions as google_exceptions
-# from fastapi import FastAPI
-
-# app = FastAPI()
+from dotenv import load_dotenv
 
 
 load_dotenv()
@@ -49,9 +41,6 @@ client = chromadb.PersistentClient(path=persist_dir)
 # Create or get the collection
 collection = client.get_or_create_collection(name="parenting_knowledge_db")
 
-# Sample data format
-# data = [{"title": "Tip 1", "content": "Parenting tip content", "tags": ["empathy", "toddlers"]}, ...]
-
 # Add data into the collection
 for i, item in enumerate(data):
     collection.add(
@@ -68,35 +57,23 @@ for i, item in enumerate(data):
 analyzer = SentimentIntensityAnalyzer()
 
 def get_sentiment(text):
-    scores = analyzer.polarity_scores(text)
-    compound = scores["compound"]
-    if compound >= 0.4:
-        return "positive"
-    elif compound <= -0.4:
-        return "negative"
-    else:
-        return "neutral"
+    score = analyzer.polarity_scores(text)["compound"]
+    return "positive" if score >= 0.4 else "negative" if score <= -0.4 else "neutral"
     
 def search_parenting_knowledge(query: str, top_k: int = 3, age_group: str = None, category: str = None):
-    conditions = []
-    if age_group:
-        conditions.append({"age_group": age_group})
-    if category:
-        conditions.append({"category": category})
+    filters = {}
+    if age_group and age_group != "Not sure":
+        filters["age_group"] = age_group
+    if category and category != "Not sure":
+        filters["category"] = category
 
-    if len(conditions) == 1:
-        where = conditions[0]
-    elif len(conditions) > 1:
-        where = {"$and": conditions}
-    else:
-        where = None
-
-    results = collection.query(
-        query_texts=[query],
-        n_results=top_k,
-        where=where 
+    res = collection.query(query_texts=[query], n_results=top_k, where=filters if filters else None)
+    docs = res["documents"][0]
+    metas = res["metadatas"][0]
+    formatted = "\n\n---\n\n".join(
+        [f"**{m['title']}** — {m['tags']}\n\n{d[:300]}..." for d, m in zip(docs, metas)]
     )
-    return results
+    return formatted[:400]
 
 def list_available_categories():
     metadata = collection.get(include=["metadatas"])
@@ -119,112 +96,96 @@ def classify_bloom_level(question):
             return level
     return "Understand"  # fallback default
 
-def format_results(results):
-    formatted = []
-    documents = results["documents"][0]
-    metadatas = results["metadatas"][0]
-    distances = results.get("distances", [[None]])[0]
+# def format_results(results):
+#     formatted = []
+#     documents = results["documents"][0]
+#     metadatas = results["metadatas"][0]
+#     distances = results.get("distances", [[None]])[0]
 
-    seen = set()
-    for i in range(len(documents)):
-        doc = documents[i]
-        meta = metadatas[i]
-        distance = distances[i]
+#     seen = set()
+#     for i in range(len(documents)):
+#         doc = documents[i]
+#         meta = metadatas[i]
+#         distance = distances[i]
 
-        if doc in seen:
-            continue
-        seen.add(doc)
+#         if doc in seen:
+#             continue
+#         seen.add(doc)
 
-        formatted.append(
-            f"**{meta['title']}**\n"
-            f"_Tags: {meta['tags']}_\n"
-            f"Relevance Score: {round(1 - distance, 2)}\n\n"
-            f"{doc}"
-        )
-    return "\n\n---\n\n".join(formatted)
+#         formatted.append(
+#             f"**{meta['title']}**\n"
+#             f"_Tags: {meta['tags']}_\n"
+#             f"Relevance Score: {round(1 - distance, 2)}\n\n"
+#             f"{doc}"
+#         )
+#     return "\n\n---\n\n".join(formatted)
 
-def safe_generate(model, prompt, max_attempts=3):
-    """Retries Gemini API call with shorter prompt and timeout protection."""
-    prompt = prompt[:4000]  # limit length for safety
-    for attempt in range(max_attempts):
-        try:
-            response = model.generate_content(prompt)
-            return response
-        except google_exceptions.DeadlineExceeded:
-            print(f"⚠️ Timeout — retrying ({attempt+1}/{max_attempts})...")
-            time.sleep(2)
-        except Exception as e:
-            print(f"💥 Unexpected error: {e}")
-            break
-    return None
+# def safe_generate(model, prompt, max_attempts=3):
+#     """Retries Gemini API call with shorter prompt and timeout protection."""
+#     prompt = prompt[:4000]  # limit length for safety
+#     for attempt in range(max_attempts):
+#         try:
+#             response = model.generate_content(prompt)
+#             return response
+#         except google_exceptions.DeadlineExceeded:
+#             print(f"⚠️ Timeout — retrying ({attempt+1}/{max_attempts})...")
+#             time.sleep(2)
+#         except Exception as e:
+#             print(f"💥 Unexpected error: {e}")
+#             break
+#     return None
 
-chat_history = []
+USE_LOCAL_GEMINI = True
 BACKEND_URL = "https://mai-backend.onrender.com/ask"
 def ask_parenting_assistant(user_question: str, age_group: str = None, category: str = None):
     global chat_history
-
-    # Retrieve context (cached)
-    if not chat_history:
-        results = search_parenting_knowledge(user_question, top_k=2, age_group=age_group, category=category)
-        context = format_results(results)
-        if len(context) > 400:
-            context = context[:400] + "..."
-    else:
-        context = chat_history[-1]["context"]
+    context = (
+        search_parenting_knowledge(user_question, top_k=2, age_group=age_group, category=category)
+        if not chat_history
+        else chat_history[-1]["context"]
+    )
 
     sentiment = get_sentiment(user_question)
-    bloom_level = classify_bloom_level(user_question)
+    bloom = classify_bloom_level(user_question)
 
-    tone_instructions = {
-        "educational": "Give 1–2 clear parenting tips.",
-        "empathic": "Be kind and understanding. Offer 1 piece of advice.",
-        "coaching": "Encourage with 2 practical steps.",
-        "summary": "Summarize clearly and concisely."
-    }
-    mode = (
+    tone = (
         "empathic" if sentiment == "negative"
         else "summary" if sentiment == "positive"
-        else "coaching" if bloom_level == "Apply"
+        else "coaching" if bloom == "Apply"
         else "educational"
     )
 
-    instructions = tone_instructions.get(mode, "Give a short, supportive answer.")
-
-    bloom_instructions = {
-        "Create": "Offer creative ideas parents can try.",
-        "Evaluate": "Give a short, balanced view.",
-        "Analyze": "Explain why this might happen.",
-        "Apply": "Suggest 1–2 small steps.",
-        "Understand": "Explain simply why this occurs.",
-        "Remember": "List 1–2 key points."
-    }
-    instructions += " " + bloom_instructions.get(bloom_level, "")
-
-    previous_rounds = ""
-    if chat_history:
-        last_turn = chat_history[-1]
-        previous_rounds = f"User: {last_turn['question']}\nAI: {last_turn['answer']}"
-
+    instructions = {
+        "educational": "Give 1–2 clear parenting tips.",
+        "empathic": "Be kind and understanding.",
+        "coaching": "Encourage with 2 practical steps.",
+        "summary": "Summarize concisely."
+    }.get(tone, "Be concise and supportive.")
+    
     prompt = f"""
 You are a warm, empathetic AI parenting coach.
-Use calm, concise language.
-If context is not enough, answer based on general parenting knowledge.
-
-Previous chat:
-{previous_rounds}
-
-Context:
-{context}
-
+Mode: {tone}
+Context: {context}
 Instruction: {instructions}
 Question: {user_question}
 """.strip()
 
-    try:
-        res = requests.post(BACKEND_URL, json={"prompt": prompt})
-        answer = res.json().get("answer", "⚠️ No response from backend.")
-    except Exception as e:
-        answer = f"⚠️ Error contacting backend: {e}"
+    if USE_LOCAL_GEMINI:
+        # Run directly
+        genai.configure(api_key=GOOGLE_API_KEY)
+        model = genai.GenerativeModel("gemini-1.5-flash-8b")
+        try:
+            response = model.generate_content(prompt)
+            answer = response.text.strip()
+        except Exception as e:
+            answer = f"⚠️ Gemini error: {e}"
+    else:
+        # Send to backend
+        try:
+            res = requests.post(BACKEND_URL, json={"prompt": prompt})
+            answer = res.json().get("answer", "⚠️ No backend response.")
+        except Exception as e:
+            answer = f"⚠️ Error contacting backend: {e}"
 
     chat_history.append({"question": user_question, "answer": answer, "context": context})
     return answer
