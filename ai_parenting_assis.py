@@ -61,19 +61,29 @@ def get_sentiment(text):
     return "positive" if score >= 0.4 else "negative" if score <= -0.4 else "neutral"
     
 def search_parenting_knowledge(query: str, top_k: int = 3, age_group: str = None, category: str = None):
-    filters = {}
-    if age_group and age_group != "Not sure":
-        filters["age_group"] = age_group
-    if category and category != "Not sure":
-        filters["category"] = category
+    conditions = []
 
-    res = collection.query(query_texts=[query], n_results=top_k, where=filters if filters else None)
-    docs = res["documents"][0]
-    metas = res["metadatas"][0]
-    formatted = "\n\n---\n\n".join(
-        [f"**{m['title']}** — {m['tags']}\n\n{d[:300]}..." for d, m in zip(docs, metas)]
+    # Build filter conditions dynamically
+    if age_group and age_group != "Not sure":
+        conditions.append({"age_group": age_group})
+    if category and category != "Not sure":
+        conditions.append({"category": category})
+
+    # Format `where` correctly for Chroma
+    if len(conditions) == 1:
+        where = conditions[0]
+    elif len(conditions) > 1:
+        where = {"$and": conditions}
+    else:
+        where = None
+
+    # Perform query
+    results = collection.query(
+        query_texts=[query],
+        n_results=top_k,
+        where=where
     )
-    return formatted[:400]
+    return results
 
 def list_available_categories():
     metadata = collection.get(include=["metadatas"])
