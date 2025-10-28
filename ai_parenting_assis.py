@@ -135,8 +135,9 @@ def classify_bloom_level(question):
 #             break
 #     return None
 
+chat_history = []
 USE_LOCAL_GEMINI = True
-BACKEND_URL = "https://mai-backend.onrender.com/ask"
+BACKEND_URL = "https://maiproject.onrender.com"
 def ask_parenting_assistant(user_question: str, age_group: str = None, category: str = None):
     global chat_history
     context = (
