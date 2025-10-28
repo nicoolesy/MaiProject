@@ -22,16 +22,7 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import time
 import google.api_core.exceptions as google_exceptions
 
-with open("kaggle.json") as f:
-    kaggle_credentials = json.load(f)
-
-# Set environment variables
-os.environ['KAGGLE_USERNAME'] = kaggle_credentials['username']
-os.environ['KAGGLE_KEY'] = kaggle_credentials['key']
-
-# Load variables from .env into environment
 load_dotenv()
-
 # Access the API key
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
@@ -160,7 +151,7 @@ def ask_parenting_assistant(user_question: str, age_group: str = None, category:
 
     # if history
     if not chat_history:
-        results = search_parenting_knowledge(user_question)
+        results = search_parenting_knowledge(user_question, top_k=2, age_group=age_group, category=category)
         context = format_results(results)
     else:
         context = chat_history[-1]["context"]
@@ -232,7 +223,14 @@ This question is at the '{bloom_level}' level of Bloom's Taxonomy. Adjust your r
 
 Now answer this: {user_question}
 """
-    response = safe_generate(model, prompt)
+    try:
+        response = model.generate_content(
+        prompt,
+        request_options={"timeout": 30}
+    )
+        answer = response.text
+    except Exception as e:
+        answer = f"⚠️ Sorry, something went wrong ({e}). Please try again in a few seconds."
 
     if response is None:
         answer = "⚠️ Sorry, Gemini took too long to respond. Please try again in a moment."
