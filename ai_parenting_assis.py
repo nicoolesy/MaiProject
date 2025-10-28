@@ -2,6 +2,7 @@ import os
 import json
 import numpy as np
 import pandas as pd
+import streamlit as st
 from langchain_google_genai import ChatGoogleGenerativeAI
 # from langchain_core.prompts import PromptTemplate
 from sklearn.metrics.pairwise import cosine_similarity
@@ -21,13 +22,17 @@ from dotenv import load_dotenv
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import time
 import google.api_core.exceptions as google_exceptions
+# from fastapi import FastAPI
+
+# app = FastAPI()
+
 
 load_dotenv()
 # Access the API key
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 genai.configure(api_key=GOOGLE_API_KEY)
-model = genai.GenerativeModel("gemini-1.5-flash")
+model = genai.GenerativeModel("gemini-1.5-flash-8b")
 
 with open(f"parenting_knowledge_base_20_clean_en.json", "r") as f:
     data = json.load(f)
@@ -160,8 +165,8 @@ def ask_parenting_assistant(user_question: str, age_group: str = None, category:
     if not chat_history:
         results = search_parenting_knowledge(user_question, top_k=2, age_group=age_group, category=category)
         context = format_results(results)
-        if len(context) > 800:
-            context = context[:800] + "..."
+        if len(context) > 400:
+            context = context[:400] + "..."
     else:
         context = chat_history[-1]["context"]
 
@@ -215,8 +220,13 @@ Question: {user_question}
 
     response = None
     try:
-        response = model.generate_content(prompt, request_options={"timeout": 45})
-        answer = response.text.strip()
+        with model.generate_content(prompt, stream=True) as stream:
+            partial_text = ""
+            for chunk in stream:
+                if chunk.text:
+                    partial_text += chunk.text
+                    st.write(partial_text)  # shows incremental output in Streamlit
+        answer = partial_text.strip()
     except Exception as e:
         answer = "⚠️ Gemini took too long. Please try again shortly."
 
