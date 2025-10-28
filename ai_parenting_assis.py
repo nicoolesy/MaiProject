@@ -215,20 +215,22 @@ def ask_parenting_assistant(user_question: str, age_group: str = None, category:
         for item in chat_history[-2:]
     ])
 
-    prompt = f"""You are an AI parenting assistant who speaks with the warmth, patience, and empathy of a kind and understanding mother.
-Your tone should be calm, supportive, and nurturing—like a parent gently guiding another parent or child through a learning moment.
+    prompt = f"""
+You are a kind and supportive AI parenting coach.
+Speak with warmth and empathy, like a caring mother guiding another parent.
 
-{previous_rounds}
-
-Use the following parenting knowledge to guide your response.
-If the documents are not sufficient, use your own knowledge to help the user in a helpful and thoughtful way. 
-This question is at the '{bloom_level}' level of Bloom's Taxonomy. Adjust your response to match the user's cognitive intent.
-
+Base your answer on this context (if relevant):
 {context}
 
-{instructions}
+Task:
+- Question level: {bloom_level}
+- Mode: {mode}
+- Goal: {instructions}
 
-Now answer this: {user_question}
+If data is missing, use general parenting knowledge. 
+Keep the response short (around 3–5 sentences), calm, and practical.
+
+Question: {user_question}
 """
     response = None
     try:
