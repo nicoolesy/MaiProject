@@ -156,92 +156,69 @@ chat_history = []
 def ask_parenting_assistant(user_question: str, age_group: str = None, category: str = None):
     global chat_history
 
-    # if history
+    # Retrieve context (cached)
     if not chat_history:
         results = search_parenting_knowledge(user_question, top_k=2, age_group=age_group, category=category)
         context = format_results(results)
+        if len(context) > 800:
+            context = context[:800] + "..."
     else:
         context = chat_history[-1]["context"]
 
-    # using VADER sentiment analysis
     sentiment = get_sentiment(user_question)
     bloom_level = classify_bloom_level(user_question)
 
-    # using VADER sentiment analysis logic
-    if sentiment == "negative":
-        mode = "empathic"
-    elif sentiment == "positive":
-        mode = "summary"
-    elif bloom_level == "Apply":
-        mode = "coaching"
-    else:
-        mode = "educational"
-        
-    print(f"🧠 Detected sentiment: {sentiment} → Auto-selected mode: {mode}")
-    print(f"🧠 Bloom’s Taxonomy level detected: {bloom_level}")
-
-    # select tone and style according to the prompt
     tone_instructions = {
-        "educational": "Give 1–2 clear parenting tips parents can try today.",
-        "empathic": "Be gentle and reassuring. Show understanding, then give 1 short piece of advice.",
-        "coaching": "Encourage the parent kindly and give 2 practical steps they can take.",
-        "summary": "Summarize insights clearly and concisely."
+        "educational": "Give 1–2 clear parenting tips.",
+        "empathic": "Be kind and understanding. Offer 1 piece of advice.",
+        "coaching": "Encourage with 2 practical steps.",
+        "summary": "Summarize clearly and concisely."
     }
-    instructions = tone_instructions.get(mode, "Offer one short, helpful answer.")
+    mode = (
+        "empathic" if sentiment == "negative"
+        else "summary" if sentiment == "positive"
+        else "coaching" if bloom_level == "Apply"
+        else "educational"
+    )
 
-    # Bloom’s Taxonomy logic
-    if bloom_level == "Create":
-        instructions += " Provide actionable ideas the parent can adapt or build upon."
-    elif bloom_level == "Evaluate":
-        instructions += " Offer a balanced perspective, discuss pros and cons, and help the parent reflect on the best course of action."
-    elif bloom_level == "Analyze":
-        instructions += " Break down the key factors, compare alternatives, and help the parent understand patterns or root causes."
-    elif bloom_level == "Apply" and mode == "coaching":
-        instructions += " Focus on helping the parent implement these ideas in real-world parenting situations."
-    elif bloom_level == "Understand":
-        instructions += " Focus on explaining why this behavior happens and what it means in terms of child development."
-    elif bloom_level == "Remember":
-        instructions += " Briefly list or define key concepts that address the parent's question."
+    instructions = tone_instructions.get(mode, "Give a short, supportive answer.")
 
-    previous_rounds = "\n".join([
-        f"User: {item['question']}\nAI: {item['answer']}"
-        for item in chat_history[-2:]
-    ])
+    bloom_instructions = {
+        "Create": "Offer creative ideas parents can try.",
+        "Evaluate": "Give a short, balanced view.",
+        "Analyze": "Explain why this might happen.",
+        "Apply": "Suggest 1–2 small steps.",
+        "Understand": "Explain simply why this occurs.",
+        "Remember": "List 1–2 key points."
+    }
+    instructions += " " + bloom_instructions.get(bloom_level, "")
+
+    previous_rounds = ""
+    if chat_history:
+        last_turn = chat_history[-1]
+        previous_rounds = f"User: {last_turn['question']}\nAI: {last_turn['answer']}"
 
     prompt = f"""
-You are a kind and supportive AI parenting coach. 
-Answer like a calm and understanding mom guiding another parent. 
-If helpful info is missing, rely on your general parenting knowledge.
+You are a warm, empathetic AI parenting coach.
+Use calm, concise language.
+If context is not enough, answer based on general parenting knowledge.
 
 Previous chat:
 {previous_rounds}
 
-Context (shortened):
+Context:
 {context}
 
 Instruction: {instructions}
 Question: {user_question}
-"""
+""".strip()
+
     response = None
     try:
-        response = model.generate_content(
-        prompt,
-        request_options={"timeout": 120}
-    )
-        answer = response.text
+        response = model.generate_content(prompt, request_options={"timeout": 45})
+        answer = response.text.strip()
     except Exception as e:
-        answer = f"⚠️ Sorry, something went wrong ({e}). Please try again in a few seconds."
+        answer = "⚠️ Gemini took too long. Please try again shortly."
 
-    if response is None:
-        answer = "⚠️ Sorry, Gemini took too long to respond. Please try again in a moment."
-    else:
-        answer = response.text or "⚠️ I didn’t get a response this time, please try again."
-    print(answer)
-
-    chat_history.append({
-        "question": user_question,
-        "answer": answer,
-        "context": context
-    })
-
+    chat_history.append({"question": user_question, "answer": answer, "context": context})
     return answer
