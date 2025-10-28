@@ -72,16 +72,35 @@ def get_sentiment(text):
         return "neutral"
     
 def search_parenting_knowledge(query: str, top_k: int = 3, age_group: str = None, category: str = None):
-    filters = {}
+    # filters = {}
+    # if age_group:
+    #     filters["age_group"] = age_group
+    # if category:
+    #     filters["category"] = category
+
+    # results = collection.query(
+    #     query_texts=[query],
+    #     n_results=top_k,
+    #     where=filters if filters else None
+    # )
+    
+    conditions = []
     if age_group:
-        filters["age_group"] = age_group
+        conditions.append({"age_group": age_group})
     if category:
-        filters["category"] = category
+        conditions.append({"category": category})
+
+    if len(conditions) == 1:
+        where = conditions[0]
+    elif len(conditions) > 1:
+        where = {"$and": conditions}
+    else:
+        where = None
 
     results = collection.query(
         query_texts=[query],
         n_results=top_k,
-        where=filters if filters else None
+        where=where 
     )
     return results
 
@@ -146,7 +165,7 @@ def safe_generate(model, prompt, max_attempts=3):
     return None
 
 chat_history = []
-def ask_parenting_assistant(user_question: str, age_group: str, category: str):
+def ask_parenting_assistant(user_question: str, age_group: str = None, category: str = None):
     global chat_history
 
     # if history
