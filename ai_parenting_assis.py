@@ -146,7 +146,7 @@ def safe_generate(model, prompt, max_attempts=3):
     return None
 
 chat_history = []
-def ask_parenting_assistant(user_question: str, age_group: str = None, category: str = None):
+def ask_parenting_assistant(user_question: str, age_group: str, category: str):
     global chat_history
 
     # if history
