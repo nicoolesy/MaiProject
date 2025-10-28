@@ -181,20 +181,13 @@ def ask_parenting_assistant(user_question: str, age_group: str = None, category:
     print(f"🧠 Bloom’s Taxonomy level detected: {bloom_level}")
 
     # select tone and style according to the prompt
-    if mode == "educational":
-        instructions = "Provide 2–3 concrete parenting activities parents can do related to this topic."
-    elif mode == "empathic":
-        instructions = (
-            "Respond with empathy and encouragement, affirming the parent's concerns while giving constructive advice."
-        )
-    elif mode == "coaching":
-        instructions = (
-            "Respond with a warm and encouraging tone, affirming the parent's efforts "
-            "while providing 2–3 specific strategies or steps they can try in everyday life. "
-            "Avoid judgmental language. Use examples when possible."
-        ) 
-    else:
-        instructions = "Summarize the relevant parenting knowledge to answer the question briefly and clearly."
+    tone_instructions = {
+        "educational": "Give 1–2 clear parenting tips parents can try today.",
+        "empathic": "Be gentle and reassuring. Show understanding, then give 1 short piece of advice.",
+        "coaching": "Encourage the parent kindly and give 2 practical steps they can take.",
+        "summary": "Summarize insights clearly and concisely."
+    }
+    instructions = tone_instructions.get(mode, "Offer one short, helpful answer.")
 
     # Bloom’s Taxonomy logic
     if bloom_level == "Create":
@@ -216,20 +209,17 @@ def ask_parenting_assistant(user_question: str, age_group: str = None, category:
     ])
 
     prompt = f"""
-You are a kind and supportive AI parenting coach.
-Speak with warmth and empathy, like a caring mother guiding another parent.
+You are a kind and supportive AI parenting coach. 
+Answer like a calm and understanding mom guiding another parent. 
+If helpful info is missing, rely on your general parenting knowledge.
 
-Base your answer on this context (if relevant):
+Previous chat:
+{previous_rounds}
+
+Context (shortened):
 {context}
 
-Task:
-- Question level: {bloom_level}
-- Mode: {mode}
-- Goal: {instructions}
-
-If data is missing, use general parenting knowledge. 
-Keep the response short (around 3–5 sentences), calm, and practical.
-
+Instruction: {instructions}
 Question: {user_question}
 """
     response = None
