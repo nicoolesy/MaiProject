@@ -16,17 +16,16 @@ _(Example question: “My kid doesn’t like to go to school.”)_
 
 ## Features
 
-✅ Age- and topic-aware parenting answers  
-✅ Real-time AI replies using **Gemini 2.0 Flash Lite**  
-✅ Emotional tone adaptation via **VADER Sentiment Analysis**  
-✅ Cognitive-intent tuning using **Bloom’s Taxonomy**  
-✅ Local knowledge retrieval with **ChromaDB**  
-✅ Seamless backend powered by **FastAPI + Render**
+- Age- and topic-aware parenting answers  
+- Real-time AI replies using **Gemini 2.0 Flash Lite**  
+- Emotional tone adaptation via **VADER Sentiment Analysis**  
+- Cognitive-intent tuning using **Bloom’s Taxonomy**  
+- Local knowledge retrieval with **ChromaDB**  
+- Seamless backend powered by **FastAPI + Render**
 
 ---
 
-<details>
-<summary><b>Tech Stack Overview</b></summary>
+## Tech Stack Overview
 
 | Layer          | Tools                                         |
 | -------------- | --------------------------------------------- |
@@ -37,8 +36,6 @@ _(Example question: “My kid doesn’t like to go to school.”)_
 | **NLP**        | VADER Sentiment Analyzer                      |
 | **Env Mgmt**   | dotenv                                        |
 | **Deployment** | Render (backend) + Streamlit Cloud (frontend) |
-
-</details>
 
 ---
 
@@ -52,15 +49,11 @@ _(Example question: “My kid doesn’t like to go to school.”)_
 
 ---
 
-<details> <summary><b>Performance Tips</b></summary>
+## Performance Tips
 
 Use "gemini-2.0-flash-lite" for fastest responses
-
 Keep prompt context under ≈ 500 characters
-
 Run Chroma locally for low-latency retrieval
-
-## Toggle local vs backend inference:
 
 ## Author
 
