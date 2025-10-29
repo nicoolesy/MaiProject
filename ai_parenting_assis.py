@@ -1,11 +1,11 @@
 import os
 import json
 import requests
-import chromadb
 import google.generativeai as genai
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from dotenv import load_dotenv
-
+import chromadb
+chromadb.telemetry.posthog.capture = lambda *a, **k: None
 
 load_dotenv()
 # Access the API key
@@ -27,15 +27,16 @@ client = chromadb.PersistentClient(path=persist_dir)
 collection = client.get_or_create_collection(name="parenting_knowledge_db")
 
 # Add data into the collection
-for i, item in enumerate(data):
-    collection.add(
-        ids=[str(i)],
-        documents=[item["content"]],
-        metadatas=[{
-            "title": item["title"],
-            "tags": ", ".join(item["tags"])  # Optional: store as comma-separated string
-        }]
-    )
+if collection.count() == 0:
+    for i, item in enumerate(data):
+        collection.add(
+            ids=[str(i)],
+            documents=[item["content"]],
+            metadatas=[{
+                "title": item["title"],
+                "tags": ", ".join(item["tags"])  # Optional: store as comma-separated string
+            }]
+        )
 
 # print("📚 Parenting knowledge base has been loaded into ChromaDB.")
 
