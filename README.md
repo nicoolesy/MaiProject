@@ -51,9 +51,9 @@ _(Example question: “My kid doesn’t like to go to school.”)_
 
 ## Performance Tips
 
-Use "gemini-2.0-flash-lite" for fastest responses
-Keep prompt context under ≈ 500 characters
-Run Chroma locally for low-latency retrieval
+💡 Use "gemini-2.0-flash-lite" for fastest responses
+💡 Keep prompt context under ≈ 500 characters
+💡 Run Chroma locally for low-latency retrieval
 
 ## Author
 
