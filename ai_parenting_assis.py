@@ -10,9 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 # Access the API key
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-
 genai.configure(api_key=GOOGLE_API_KEY)
-model = genai.GenerativeModel("gemini-2.0-flash-lite")
 
 with open(f"parenting_knowledge_base_20_clean_en.json", "r") as f:
     data = json.load(f)
@@ -99,7 +97,7 @@ BACKEND_URL = "https://maiproject.onrender.com/ask"
 def ask_parenting_assistant(user_question: str, age_group: str = None, category: str = None):
     global chat_history
     context = (
-        search_parenting_knowledge(user_question, top_k=2, age_group=age_group, category=category)
+        search_parenting_knowledge(user_question, top_k=3, age_group=age_group, category=category)
         if not chat_history
         else chat_history[-1]["context"]
     )
@@ -132,7 +130,7 @@ Question: {user_question}
     if USE_LOCAL_GEMINI:
         # Run directly
         genai.configure(api_key=GOOGLE_API_KEY)
-        model = genai.GenerativeModel("gemini-1.5-flash-8b")
+        model = genai.GenerativeModel("gemini-2.0-flash-lite")
         try:
             response = model.generate_content(prompt)
             answer = response.text.strip()
