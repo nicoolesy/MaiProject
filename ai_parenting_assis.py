@@ -25,7 +25,7 @@ load_dotenv()
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 genai.configure(api_key=GOOGLE_API_KEY)
-model = genai.GenerativeModel("gemini-1.5-flash")
+model = genai.GenerativeModel("gemini-2.0-flash-lite")
 
 with open(f"parenting_knowledge_base_20_clean_en.json", "r") as f:
     data = json.load(f)
@@ -105,45 +105,6 @@ def classify_bloom_level(question):
         if any(kw in q for kw in keywords):
             return level
     return "Understand"  # fallback default
-
-# def format_results(results):
-#     formatted = []
-#     documents = results["documents"][0]
-#     metadatas = results["metadatas"][0]
-#     distances = results.get("distances", [[None]])[0]
-
-#     seen = set()
-#     for i in range(len(documents)):
-#         doc = documents[i]
-#         meta = metadatas[i]
-#         distance = distances[i]
-
-#         if doc in seen:
-#             continue
-#         seen.add(doc)
-
-#         formatted.append(
-#             f"**{meta['title']}**\n"
-#             f"_Tags: {meta['tags']}_\n"
-#             f"Relevance Score: {round(1 - distance, 2)}\n\n"
-#             f"{doc}"
-#         )
-#     return "\n\n---\n\n".join(formatted)
-
-# def safe_generate(model, prompt, max_attempts=3):
-#     """Retries Gemini API call with shorter prompt and timeout protection."""
-#     prompt = prompt[:4000]  # limit length for safety
-#     for attempt in range(max_attempts):
-#         try:
-#             response = model.generate_content(prompt)
-#             return response
-#         except google_exceptions.DeadlineExceeded:
-#             print(f"⚠️ Timeout — retrying ({attempt+1}/{max_attempts})...")
-#             time.sleep(2)
-#         except Exception as e:
-#             print(f"💥 Unexpected error: {e}")
-#             break
-#     return None
 
 chat_history = []
 USE_LOCAL_GEMINI = False
