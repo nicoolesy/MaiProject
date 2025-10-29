@@ -1,22 +1,9 @@
 import os
 import json
-import numpy as np
-import pandas as pd
 import requests
-from langchain_google_genai import ChatGoogleGenerativeAI
-from sklearn.metrics.pairwise import cosine_similarity
-from langchain_community.vectorstores import Chroma
-from langchain.document_loaders import TextLoader
-from langchain_text_splitters import CharacterTextSplitter
-from langchain.vectorstores import Chroma
-from langchain.prompts import PromptTemplate
 import chromadb
-from chromadb.config import Settings
-from chromadb import PersistentClient
 import google.generativeai as genai
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-import time
-import google.api_core.exceptions as google_exceptions
 from dotenv import load_dotenv
 
 
