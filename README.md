@@ -9,7 +9,7 @@ It provides personalized, empathetic guidance for parents — tailored by a chil
 
 ## 🌟 Demo
 
-![App Demo](images/demo.png)  
+![App Demo](parenting_project/demo.png)  
 _(Example question: “My kid doesn’t like to go to school.”)_
 
 ---
