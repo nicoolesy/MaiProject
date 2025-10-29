@@ -16,9 +16,5 @@ scikit-learn==1.5.2
 numpy==1.26.4
 pandas==2.2.3
 
-# LangChain core (optional lightweight)
-langchain-core>=0.1.53
-langchain-community>=0.0.38
-
 # Environment variables
 python-dotenv==1.0.1
